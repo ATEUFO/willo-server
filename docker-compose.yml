@@ -1,0 +1,116 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: sih-nginx
+    ports:
+      - "5030:5030"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - auth-service
+      - realtime-gateway
+      - fhir-service
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: sih-postgres
+    environment:
+      POSTGRES_USER: sih_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: sih_db
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: sih-redis
+    command: [ "redis-server", "--appendonly", "yes" ]
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  minio:
+    image: minio/minio:latest
+    container_name: sih-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio-data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  auth-service:
+    build: ../server/auth-service
+    container_name: sih-auth-service
+    env_file: .env
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  fhir-service:
+    build: ../server/fhir-service
+    container_name: sih-fhir-service
+    env_file: .env
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  realtime-gateway:
+    build: ../server/realtime-gateway
+    container_name: sih-realtime-gateway
+    env_file: .env
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  ai-diagnosis-service:
+    build: ../server/ai-diagnosis-service
+    container_name: sih-ai-diagnosis-service
+    env_file: .env
+    depends_on:
+      - redis
+      - fhir-service
+    restart: unless-stopped
+    networks:
+      - sih-net
+  # ... répéter le même schéma "build:" pour clinique-service, labo-service,
+  #     pharmacie-service, facturation-service, statistiques-service,
+  #     notification-service, audit-service, file-service
+
+networks:
+  sih-net:
+    driver: bridge
+
+volumes:
+  pg-data:
+  redis-data:
+  minio-data:
