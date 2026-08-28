@@ -1,6 +1,5 @@
-version: "3.9"
-
 services:
+  # ─── Nginx Reverse Proxy ──────────────────────────────────────────────────
   nginx:
     image: nginx:1.27-alpine
     container_name: sih-nginx
@@ -8,50 +7,71 @@ services:
       - "5030:5030"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - auth-service
-      - realtime-gateway
       - fhir-service
+      - labo-service
+      - pharmacie-service
+      - facturation-service
+      - statistiques-service
+      - ai-diagnosis-service
+      - notification-service
+      - audit-service
+      - file-service
+      - realtime-gateway
+      - clinique-service
     restart: unless-stopped
     networks:
       - sih-net
 
+  # ─── Base de données PostgreSQL ───────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
     container_name: sih-postgres
     environment:
-      POSTGRES_USER: sih_admin
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: sih_db
+      POSTGRES_USER: ${POSTGRES_USER:-sih_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+      POSTGRES_DB: ${POSTGRES_DB:-sih_db}
     volumes:
       - pg-data:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sih_admin} -d ${POSTGRES_DB:-sih_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks:
       - sih-net
 
+  # ─── Cache & Pub/Sub Redis ────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: sih-redis
-    command: [ "redis-server", "--appendonly", "yes" ]
+    command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redis-data:/data
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks:
       - sih-net
 
+  # ─── Stockage d'objets MinIO (Fichiers & DICOM) ───────────────────────────
   minio:
     image: minio/minio:latest
     container_name: sih-minio
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-change_me_in_production}
     volumes:
       - minio-data:/data
     ports:
@@ -61,50 +81,173 @@ services:
     networks:
       - sih-net
 
+  # ─── Microservices ────────────────────────────────────────────────────────
+
   auth-service:
-    build: ../server/auth-service
+    build: ./auth-service
     container_name: sih-auth-service
     env_file: .env
+    ports:
+      - "3001:3001"
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - sih-net
 
   fhir-service:
-    build: ../server/fhir-service
+    build: ./fhir-service
     container_name: sih-fhir-service
     env_file: .env
+    ports:
+      - "3002:3002"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - sih-net
 
-  realtime-gateway:
-    build: ../server/realtime-gateway
-    container_name: sih-realtime-gateway
+  labo-service:
+    build: ./labo-service
+    container_name: sih-labo-service
     env_file: .env
+    ports:
+      - "3003:3003"
     depends_on:
-      - redis
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  pharmacie-service:
+    build: ./pharmacie-service
+    container_name: sih-pharmacie-service
+    env_file: .env
+    ports:
+      - "3004:3004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  facturation-service:
+    build: ./facturation-service
+    container_name: sih-facturation-service
+    env_file: .env
+    ports:
+      - "3005:3005"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  statistiques-service:
+    build: ./statistiques-service
+    container_name: sih-statistiques-service
+    env_file: .env
+    ports:
+      - "3006:3006"
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - sih-net
 
   ai-diagnosis-service:
-    build: ../server/ai-diagnosis-service
+    build: ./ai-diagnosis-service
     container_name: sih-ai-diagnosis-service
     env_file: .env
+    ports:
+      - "3007:3007"
     depends_on:
-      - redis
-      - fhir-service
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      fhir-service:
+        condition: service_started
     restart: unless-stopped
     networks:
       - sih-net
-  # ... répéter le même schéma "build:" pour clinique-service, labo-service,
-  #     pharmacie-service, facturation-service, statistiques-service,
-  #     notification-service, audit-service, file-service
+
+  notification-service:
+    build: ./notification-service
+    container_name: sih-notification-service
+    env_file: .env
+    ports:
+      - "3008:3008"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  audit-service:
+    build: ./audit-service
+    container_name: sih-audit-service
+    env_file: .env
+    ports:
+      - "3009:3009"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  file-service:
+    build: ./file-service
+    container_name: sih-file-service
+    env_file: .env
+    ports:
+      - "3010:3010"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  realtime-gateway:
+    build: ./realtime-gateway
+    container_name: sih-realtime-gateway
+    env_file: .env
+    ports:
+      - "3011:3011"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sih-net
+
+  clinique-service:
+    build: ./clinique-service
+    container_name: sih-clinique-service
+    env_file: .env
+    ports:
+      - "3016:3016"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sih-net
 
 networks:
   sih-net:

@@ -1,6 +1,5 @@
 /**
  * fhir-service — Plugin PostgreSQL
- * Enregistre @fastify/postgres avec la DATABASE_URL de fhir-service.
  */
 import fp from 'fastify-plugin';
 import fastifyPostgres from '@fastify/postgres';
@@ -14,11 +13,9 @@ export default fp(async function dbPlugin(fastify: FastifyInstance) {
 
   await fastify.register(fastifyPostgres, {
     connectionString,
-    pg: {
-      max: 30,           // fhir-service est le plus sollicité
-      idleTimeoutMillis: 30_000,
-      connectionTimeoutMillis: 5_000,
-    },
+    max: 30,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 5_000,
   });
 
   fastify.log.info('✅ PostgreSQL connecté (fhir-service)');

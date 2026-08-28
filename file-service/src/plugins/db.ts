@@ -13,11 +13,9 @@ export default fp(async function dbPlugin(fastify: FastifyInstance) {
 
   await fastify.register(fastifyPostgres, {
     connectionString,
-    pg: {
-      max: 10,
-      idleTimeoutMillis: 30_000,
-      connectionTimeoutMillis: 5_000,
-    },
+    max: 10,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 5_000,
   });
 
   fastify.log.info('✅ PostgreSQL connecté (file-service)');
