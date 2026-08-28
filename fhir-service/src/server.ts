@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import dbPlugin from './plugins/db.js';
 
 const server = Fastify({
   logger: process.env.NODE_ENV !== 'production'
@@ -15,23 +16,29 @@ const server = Fastify({
     : true,
 });
 
-// Register CORS
-await server.register(cors, {
-  origin: true,
-});
+// ─── Plugins ──────────────────────────────────────────────────────────────
+await server.register(cors, { origin: true });
+await server.register(dbPlugin);
 
-// Health check and root paths
+// ─── Health check ─────────────────────────────────────────────────────────
 server.get('/health', async () => {
-  return { status: 'OK', service: 'fhir-service' };
+  const client = await server.pg.connect();
+  try {
+    const { rows } = await client.query('SELECT NOW() AS now');
+    return { status: 'OK', service: 'fhir-service', db: 'connected', time: rows[0].now };
+  } finally {
+    client.release();
+  }
 });
 
 server.get('/', async () => {
   return { message: 'Welcome to fhir-service API' };
 });
 
+// ─── Démarrage ────────────────────────────────────────────────────────────
 const start = async () => {
   try {
-    const port = Number(process.env.PORT) || 3013;
+    const port = Number(process.env.FHIR_PORT ?? process.env.PORT) || 3002;
     const host = process.env.HOST || '0.0.0.0';
     await server.listen({ port, host });
   } catch (err) {
@@ -41,3 +48,4 @@ const start = async () => {
 };
 
 start();
+
