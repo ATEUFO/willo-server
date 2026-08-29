@@ -1,1 +1,1 @@
-{"version":3,"file":"publish.d.ts","sourceRoot":"","sources":["../../src/discovery/publish.ts"],"names":[],"mappings":"AAKA,wBAAgB,qBAAqB,SAWpC"}
+{"version":3,"file":"publish.d.ts","sourceRoot":"","sources":["../../src/discovery/publish.ts"],"names":[],"mappings":"AAMA,wBAAgB,qBAAqB,CAAC,GAAG,CAAC,EAAE;IAAE,IAAI,EAAE,CAAC,GAAG,EAAE,MAAM,KAAK,IAAI,CAAC;IAAC,IAAI,EAAE,CAAC,GAAG,EAAE,MAAM,KAAK,IAAI,CAAC;IAAC,KAAK,EAAE,CAAC,GAAG,EAAE,MAAM,KAAK,IAAI,CAAA;CAAE,QA8BrI;AAED,wBAAgB,kBAAkB,CAAC,GAAG,CAAC,EAAE;IAAE,IAAI,EAAE,CAAC,GAAG,EAAE,MAAM,KAAK,IAAI,CAAA;CAAE,QAevE"}

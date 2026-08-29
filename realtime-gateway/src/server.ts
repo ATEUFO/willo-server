@@ -4,6 +4,7 @@ import fastifyWebsocket from '@fastify/websocket';
 import fastifyJwt from '@fastify/jwt';
 import redisPlugin from './plugins/redis.js';
 import { ConnectionManager, type ExtWebSocket } from './services/connection-manager.js';
+import { publishServerPresence, stopServerPresence } from './discovery/publish.js';
 
 const server = Fastify({
   logger: process.env.NODE_ENV !== 'production'
@@ -42,7 +43,6 @@ server.ready().then(() => {
   server.redisSub.on('pmessage', (_pattern: string, channel: string, messageStr: string) => {
     try {
       const data = JSON.parse(messageStr);
-      // Le canal Redis est sous la forme `willo:user:123` ou `willo:resource:Patient`
       const targetChannel = channel.replace(/^willo:/, '');
       connectionManager.broadcastEvent({
         type: data.type || 'event',
@@ -53,6 +53,11 @@ server.ready().then(() => {
       // Ignorer messages non-JSON
     }
   });
+});
+
+// ─── Hook d'arrêt propre ──────────────────────────────────────────────────
+server.addHook('onClose', async () => {
+  stopServerPresence(server.log);
 });
 
 // ─── Routes WebSocket ─────────────────────────────────────────────────────
@@ -66,7 +71,6 @@ server.register(async function (fastify) {
     });
   });
 
-  // Route fallback / pour compatibilité
   fastify.get('/', { websocket: true }, (connection: any, req) => {
     const socket = (connection.socket || connection) as ExtWebSocket;
     connectionManager.handleConnection(socket, (token: string) => {
@@ -75,13 +79,29 @@ server.register(async function (fastify) {
   });
 });
 
-// ─── Health check ─────────────────────────────────────────────────────────
+// ─── Health check & Discovery HTTP Fallback ────────────────────────────────
 server.get('/health', async () => {
   return {
     status: 'OK',
     service: 'realtime-gateway',
     activeConnections: connectionManager.getConnectedCount(),
+    discovery: 'bonjour-mdns-active',
     time: new Date().toISOString(),
+  };
+});
+
+server.get('/discovery', async () => {
+  return {
+    service: 'willo-server',
+    siteName: process.env.SITE_NAME || 'Centre de Santé Willo',
+    apiVersion: '1.0',
+    caFingerprint: process.env.CA_FINGERPRINT || 'default-sha256-fingerprint',
+    ports: {
+      proxy: 5030,
+      auth: 3001,
+      fhir: 3002,
+      realtime: 3011,
+    },
   };
 });
 
@@ -92,6 +112,9 @@ const start = async () => {
     const host = process.env.HOST || '0.0.0.0';
     await server.listen({ port, host });
     server.log.info(`🚀 Realtime Gateway WebSocket actif sur http://${host}:${port}/ws`);
+
+    // Démarrage de la publication Bonjour ZeroConf mDNS
+    publishServerPresence(server.log);
   } catch (err) {
     server.log.error(err);
     process.exit(1);
