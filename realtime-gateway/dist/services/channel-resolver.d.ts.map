@@ -1,0 +1,1 @@
+{"version":3,"file":"channel-resolver.d.ts","sourceRoot":"","sources":["../../src/services/channel-resolver.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAEH,MAAM,WAAW,WAAW;IAC1B,MAAM,EAAE,MAAM,CAAC;IACf,IAAI,EAAE,MAAM,CAAC;IACb,MAAM,CAAC,EAAE,MAAM,GAAG,SAAS,CAAC;CAC7B;AAED,wBAAgB,sBAAsB,CAAC,IAAI,EAAE,WAAW,GAAG,MAAM,EAAE,CAmClE"}

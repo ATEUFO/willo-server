@@ -13,6 +13,7 @@
   "dependencies": {
     "@fastify/cors": "^11.3.0",
     "@fastify/env": "^7.0.0",
+    "@fastify/jwt": "^10.2.2",
     "@fastify/websocket": "^11.3.0",
     "bonjour-service": "^1.4.4",
     "fastify": "^5.12.1",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.4.0",
+    "@types/ws": "^8.18.1",
     "tsx": "^4.23.12",
     "typescript": "^7.0.2"
   }

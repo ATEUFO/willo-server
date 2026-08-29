@@ -20,11 +20,17 @@ CREATE TABLE IF NOT EXISTS fhir_resources (
     practitioner_id VARCHAR(36),                    -- fhirId du Practitioner principal
     organization_id VARCHAR(36),                    -- fhirId de l'Organization
     status          VARCHAR(32),                    -- status dénormalisé pour filtres
+    client_mutation_id VARCHAR(36),                 -- UUID d'idempotence côté client
     last_updated    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     CONSTRAINT uq_fhir_resource_type_id UNIQUE (resource_type, fhir_id)
 );
+
+-- Index d'idempotence client
+CREATE INDEX IF NOT EXISTS idx_fhir_client_mutation_id
+    ON fhir_resources(client_mutation_id)
+    WHERE client_mutation_id IS NOT NULL;
 
 -- ─── Index de recherche ────────────────────────────────────────────────────
 

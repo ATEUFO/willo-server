@@ -1,6 +1,8 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import dbPlugin from './plugins/db.js';
+import jwtPlugin from './plugins/jwt.js';
+import authRoutes from './routes/auth.route.js';
 
 const server = Fastify({
   logger: process.env.NODE_ENV !== 'production'
@@ -19,10 +21,14 @@ const server = Fastify({
 // ─── Plugins ──────────────────────────────────────────────────────────────
 await server.register(cors, { origin: true });
 await server.register(dbPlugin);
+await server.register(jwtPlugin);
+
+// ─── Routes ───────────────────────────────────────────────────────────────
+await server.register(authRoutes, { prefix: '/api/auth' });
+await server.register(authRoutes); // supporte aussi les appels sans préfixe si accès direct
 
 // ─── Health check ─────────────────────────────────────────────────────────
 server.get('/health', async () => {
-  // Vérifie aussi la connexion DB
   const client = await server.pg.connect();
   try {
     const { rows } = await client.query('SELECT NOW() AS now');
@@ -49,4 +55,3 @@ const start = async () => {
 };
 
 start();
-

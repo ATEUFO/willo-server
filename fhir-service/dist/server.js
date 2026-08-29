@@ -1,6 +1,8 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import dbPlugin from './plugins/db.js';
+import redisPlugin from './plugins/redis.js';
+import fhirRoutes from './routes/fhir.route.js';
 const server = Fastify({
     logger: process.env.NODE_ENV !== 'production'
         ? {
@@ -17,6 +19,10 @@ const server = Fastify({
 // ─── Plugins ──────────────────────────────────────────────────────────────
 await server.register(cors, { origin: true });
 await server.register(dbPlugin);
+await server.register(redisPlugin);
+// ─── Routes ───────────────────────────────────────────────────────────────
+await server.register(fhirRoutes, { prefix: '/api/fhir' });
+await server.register(fhirRoutes); // supporte aussi /sync/bootstrap sans /api/fhir prefix si appelé en direct
 // ─── Health check ─────────────────────────────────────────────────────────
 server.get('/health', async () => {
     const client = await server.pg.connect();
