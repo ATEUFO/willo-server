@@ -1,0 +1,36 @@
+{
+  "nomModele": "lab-anomaly-detection-v1",
+  "version": "1.0.0",
+  "max_depth": 4,
+  "features": [
+    "creatinine",
+    "leucocytes",
+    "plaquettes",
+    "bilirubine",
+    "crp",
+    "hemoglobine",
+    "potassium",
+    "natremie"
+  ],
+  "classes": [
+    0,
+    1
+  ],
+  "metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0
+  },
+  "feature_importances": {
+    "creatinine": 0.0,
+    "leucocytes": 0.0,
+    "plaquettes": 0.0248,
+    "bilirubine": 0.0,
+    "crp": 0.9752,
+    "hemoglobine": 0.0,
+    "potassium": 0.0,
+    "natremie": 0.0
+  },
+  "model_file": "lab-anomaly-detection-v1.joblib"
+}

@@ -1,0 +1,34 @@
+{
+  "nomModele": "readmission-risk-v1",
+  "version": "1.0.0",
+  "max_depth": 4,
+  "features": [
+    "age",
+    "nbHospitalisationsRecentes",
+    "dureeSejourJours",
+    "comorbiditesCount",
+    "scoreGlasgow",
+    "bmi",
+    "autonomie"
+  ],
+  "classes": [
+    0,
+    1
+  ],
+  "metrics": {
+    "accuracy": 0.985,
+    "precision": 0.9857,
+    "recall": 0.985,
+    "f1_score": 0.9851
+  },
+  "feature_importances": {
+    "age": 0.0242,
+    "nbHospitalisationsRecentes": 0.2264,
+    "dureeSejourJours": 0.0019,
+    "comorbiditesCount": 0.7075,
+    "scoreGlasgow": 0.0,
+    "bmi": 0.0,
+    "autonomie": 0.0399
+  },
+  "model_file": "readmission-risk-v1.joblib"
+}

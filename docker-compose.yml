@@ -167,8 +167,10 @@ services:
     build: ./ai-diagnosis-service
     container_name: sih-ai-diagnosis-service
     env_file: .env
+    environment:
+      - PORT=${AI_PORT:-3007}
     ports:
-      - "3007:3007"
+      - "${AI_PORT:-3007}:${AI_PORT:-3007}"
     depends_on:
       postgres:
         condition: service_healthy
