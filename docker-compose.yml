@@ -14,12 +14,13 @@ services:
       - pharmacie-service
       - facturation-service
       - statistiques-service
-      - ai-diagnosis-service
       - notification-service
       - audit-service
       - file-service
       - realtime-gateway
       - clinique-service
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     networks:
       - sih-net
