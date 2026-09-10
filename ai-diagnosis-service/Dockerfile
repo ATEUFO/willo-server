@@ -1,20 +1,20 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
-# System dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Variables d'environnement Python pour le conteneur
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app \
+    PORT=3007
 
+# Installer les dépendances Python (asyncpg utilise des wheels précompilées, pas besoin de libpq-dev)
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Copier le code source
+COPY src/ ./src/
 
-ENV PORT=3007
 EXPOSE ${PORT}
 
 CMD ["sh", "-c", "uvicorn src.main:app --host 0.0.0.0 --port ${PORT:-3007}"]
-

@@ -74,37 +74,41 @@ async def fetch_fhir_observations(observation_ids: list[str]) -> Dict[str, float
     if not observation_ids:
         return extracted_features
 
+    configured_fhir_url = os.getenv("FHIR_SERVICE_URL")
+    candidate_urls = [configured_fhir_url] if configured_fhir_url else ["http://fhir-service:3002", "http://localhost:3002"]
+
     async with httpx.AsyncClient(timeout=3.0) as client:
         for obs_id in observation_ids:
-            try:
-                # Attempt fetching from local fhir-service
-                resp = await client.get(f"http://fhir-service:3002/Observation/{obs_id}")
-                if resp.status_code == 200:
-                    data = resp.json()
-                    # Parse FHIR Observation code & valueQuantity
-                    code = data.get("code", {}).get("coding", [{}])[0].get("code", "")
-                    val = data.get("valueQuantity", {}).get("value")
-                    if code and val is not None:
-                        # Map common FHIR LOINC codes to feature keys
-                        code_mapping = {
-                            "8310-5": "temperature",
-                            "8867-4": "frequenceCardiaque",
-                            "2708-6": "saturationO2",
-                            "9279-1": "frequenceRespiratoire",
-                            "8480-6": "pressionSystolique",
-                            "8462-4": "pressionDiastolique",
-                            "6690-2": "leucocytes",
-                            "777-3": "plaquettes",
-                            "2571-8": "triglycerides",
-                            "2160-0": "creatinine",
-                            "1975-2": "bilirubine",
-                            "1988-5": "crp"
-                        }
-                        feat_name = code_mapping.get(code)
-                        if feat_name:
-                            extracted_features[feat_name] = float(val)
-            except Exception as e:
-                logger.debug(f"Could not fetch observation {obs_id} from FHIR service: {e}")
+            for base_url in candidate_urls:
+                try:
+                    resp = await client.get(f"{base_url.rstrip('/')}/Observation/{obs_id}")
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        # Parse FHIR Observation code & valueQuantity
+                        code = data.get("code", {}).get("coding", [{}])[0].get("code", "")
+                        val = data.get("valueQuantity", {}).get("value")
+                        if code and val is not None:
+                            # Map common FHIR LOINC codes to feature keys
+                            code_mapping = {
+                                "8310-5": "temperature",
+                                "8867-4": "frequenceCardiaque",
+                                "2708-6": "saturationO2",
+                                "9279-1": "frequenceRespiratoire",
+                                "8480-6": "pressionSystolique",
+                                "8462-4": "pressionDiastolique",
+                                "6690-2": "leucocytes",
+                                "777-3": "plaquettes",
+                                "2571-8": "triglycerides",
+                                "2160-0": "creatinine",
+                                "1975-2": "bilirubine",
+                                "1988-5": "crp"
+                            }
+                            feat_name = code_mapping.get(code)
+                            if feat_name:
+                                extracted_features[feat_name] = float(val)
+                        break
+                except Exception as e:
+                    logger.debug(f"Could not fetch observation {obs_id} from {base_url}: {e}")
     return extracted_features
 
 

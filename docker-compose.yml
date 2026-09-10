@@ -168,9 +168,14 @@ services:
     container_name: sih-ai-diagnosis-service
     env_file: .env
     environment:
-      - PORT=${AI_PORT:-3007}
+      - PORT=3007
+      - AI_PORT=3007
+      - PYTHONUNBUFFERED=1
+      - AI_DATABASE_URL=postgresql://${POSTGRES_USER:-sih_admin}:${POSTGRES_PASSWORD:-change_me_in_production}@postgres:5432/${POSTGRES_DB:-sih_db}
     ports:
-      - "${AI_PORT:-3007}:${AI_PORT:-3007}"
+      - "3007:3007"
+    volumes:
+      - ai-models-data:/app/src/ml/saved_models
     depends_on:
       postgres:
         condition: service_healthy
@@ -178,6 +183,12 @@ services:
         condition: service_healthy
       fhir-service:
         condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:3007/health')\""]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
     networks:
       - sih-net
@@ -259,3 +270,4 @@ volumes:
   pg-data:
   redis-data:
   minio-data:
+  ai-models-data:

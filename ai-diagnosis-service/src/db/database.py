@@ -1,7 +1,8 @@
 import os
 import json
 import logging
-from typing import Optional, Dict, Any
+import time
+from typing import Optional, Dict, Any, List
 import asyncpg
 
 logger = logging.getLogger("ai_diagnosis_db")
@@ -13,27 +14,52 @@ PG_PASSWORD = os.getenv("POSTGRES_PASSWORD", os.getenv("PGPASSWORD", "change_me_
 PG_DB = os.getenv("POSTGRES_DB", os.getenv("PGDATABASE", "sih_db"))
 
 pool: Optional[asyncpg.Pool] = None
+_last_failed_time: float = 0
+_COOLDOWN_SECONDS: float = 30.0
+
+
+def _get_candidate_hosts() -> List[str]:
+    hosts = [PG_HOST]
+    fallbacks = ["localhost", "127.0.0.1"]
+    for fb in fallbacks:
+        if fb not in hosts:
+            hosts.append(fb)
+    return hosts
 
 
 async def get_db_pool() -> Optional[asyncpg.Pool]:
-    global pool
-    if pool is None:
+    global pool, _last_failed_time
+    if pool is not None:
+        return pool
+
+    now = time.time()
+    if _last_failed_time > 0 and (now - _last_failed_time) < _COOLDOWN_SECONDS:
+        return None
+
+    candidate_hosts = _get_candidate_hosts()
+    last_exception = None
+
+    for host in candidate_hosts:
         try:
             pool = await asyncpg.create_pool(
-                host=PG_HOST,
+                host=host,
                 port=int(PG_PORT),
                 user=PG_USER,
                 password=PG_PASSWORD,
                 database=PG_DB,
                 min_size=1,
                 max_size=10,
-                timeout=10.0
+                timeout=5.0
             )
-            logger.info("Connected to PostgreSQL database successfully.")
+            logger.info(f"Connected to PostgreSQL database successfully (host: {host}).")
+            _last_failed_time = 0
+            return pool
         except Exception as e:
-            logger.warning(f"Could not connect to PostgreSQL: {e}. DB logging will be disabled until DB is online.")
-            pool = None
-    return pool
+            last_exception = e
+
+    _last_failed_time = time.time()
+    logger.warning(f"Could not connect to PostgreSQL (tried {candidate_hosts}): {last_exception}. DB logging will be disabled until DB is online.")
+    return None
 
 
 async def init_ai_schema():
