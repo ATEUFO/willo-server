@@ -221,10 +221,18 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
     const client = await fastify.pg.connect();
     try {
+      let targetSiteId = siteId;
+      if (!targetSiteId || targetSiteId === '00000000-0000-0000-0000-000000000000') {
+        const siteRes = await client.query(`SELECT id FROM sites LIMIT 1`);
+        if (siteRes.rows.length > 0) {
+          targetSiteId = siteRes.rows[0].id;
+        }
+      }
+
       const res = await client.query(
         `INSERT INTO pairing_codes (code, site_id, expires_at)
          VALUES ($1, $2, $3) RETURNING id, code, expires_at`,
-        [code, siteId || '00000000-0000-0000-0000-000000000000', expiresAt]
+        [code, targetSiteId, expiresAt]
       );
 
       return reply.send({
