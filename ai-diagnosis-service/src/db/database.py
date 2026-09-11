@@ -20,11 +20,12 @@ _COOLDOWN_SECONDS: float = 30.0
 
 def _get_candidate_hosts() -> List[str]:
     hosts = [PG_HOST]
-    fallbacks = ["localhost", "127.0.0.1"]
+    fallbacks = ["postgres", "localhost", "127.0.0.1"]
     for fb in fallbacks:
         if fb not in hosts:
             hosts.append(fb)
     return hosts
+
 
 
 async def get_db_pool() -> Optional[asyncpg.Pool]:

@@ -172,6 +172,7 @@ services:
       - PORT=3007
       - AI_PORT=3007
       - PYTHONUNBUFFERED=1
+      - POSTGRES_HOST=postgres
       - AI_DATABASE_URL=postgresql://${POSTGRES_USER:-sih_admin}:${POSTGRES_PASSWORD:-change_me_in_production}@postgres:5432/${POSTGRES_DB:-sih_db}
     ports:
       - "3007:3007"
