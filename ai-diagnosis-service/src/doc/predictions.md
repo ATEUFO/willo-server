@@ -76,7 +76,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 
 **Version :** `1.2.0` | **Classes :** 3 niveaux (0 = Faible, 1 = Modéré, 2 = Élevé/Critique)
 
-#### 📌 Features utilisées par le modèle (dans l'ordre exact) :
+#### 📌 Features utilisées par le modèle (dans l'ordre exact)
 
 | # | Feature (`clé`) | Unité | Description |
 | :--- | :--- | :--- | :--- |
@@ -94,7 +94,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 | 12 | `age` | années | Âge du patient |
 | 13 | `sexe` | 0/1 | Sexe (0 = Féminin, 1 = Masculin) |
 
-#### 📊 Seuils Physiologiques et Impacts Analysés par l'IA :
+#### 📊 Seuils Physiologiques et Impacts Analysés par l'IA
 
 | Variable (`feature`) | Valeur / Seuil Détecté | Impact Identifié | Explication clinique |
 | :--- | :--- | :--- | :--- |
@@ -103,14 +103,14 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 | `pressionSystolique` | `<= 90 mmHg` | `CRITICAL` | Hypotension artérielle (Choc septique) |
 | `pressionSystolique` | `< 100 mmHg` | `MODERATE` | Pression systolique limite |
 | `frequenceCardiaque` | `> 90 bpm` | `MODERATE` | Tachycardie |
-| `frequenceRespiratoire`| `>= 22 cycles/min` | `HIGH` | Tachypnée (Critère qSOFA) |
+| `frequenceRespiratoire` | `>= 22 cycles/min` | `HIGH` | Tachypnée (Critère qSOFA) |
 | `leucocytes` | `> 12 000 /mm³` | `MODERATE` | Hyperleucocytose inflammatoire |
 | `leucocytes` | `< 4 000 /mm³` | `HIGH` | Leucopénie séro-immunitaire |
 | `lactate` | `> 2.0 mmol/L` | `HIGH` | Hyperlactatémie (Hypoperfusion tissulaire) |
 | `lactate` | `> 4.0 mmol/L` | `CRITICAL` | Hyperlactatémie sévère (Choc) |
 | `scoreGlasgow` | `< 15` | `HIGH` | Altération de l'état de conscience |
 
-#### 🔴 Logique de Niveaux de Risque Final :
+#### 🔴 Logique de Niveaux de Risque Final
 
 | Condition | `niveauRisque` | `intituleDiagnostic` |
 | :--- | :--- | :--- |
@@ -124,7 +124,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 
 **Version :** `1.1.0` | **Classes :** 2 niveaux (0 = Faible, 1 = Élevé)
 
-#### 📌 Features utilisées par le modèle (dans l'ordre exact) :
+#### 📌 Features utilisées par le modèle (dans l'ordre exact)
 
 | # | Feature (`clé`) | Unité | Description |
 | :--- | :--- | :--- | :--- |
@@ -137,7 +137,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 | 7 | `sexe` | 0/1 | Sexe (0 = Féminin, 1 = Masculin) |
 | 8 | `dureeSymptomesJours` | jours | Durée des symptômes |
 
-#### 📊 Seuils Physiologiques et Impacts Analysés par l'IA :
+#### 📊 Seuils Physiologiques et Impacts Analysés par l'IA
 
 | Variable (`feature`) | Valeur / Seuil Détecté | Impact Identifié | Explication clinique |
 | :--- | :--- | :--- | :--- |
@@ -146,7 +146,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 | `plaquettes` | `< 150 000 /mm³` | `HIGH` | Thrombopénie associée au paludisme |
 | `hemoglobine` | `< 11.0 g/dL` | `MODERATE` | Anémie palustre |
 
-#### 🔴 Logique de Niveaux de Risque Final :
+#### 🔴 Logique de Niveaux de Risque Final
 
 | Condition | `niveauRisque` | `intituleDiagnostic` |
 | :--- | :--- | :--- |
@@ -159,7 +159,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 
 **Version :** `1.0.0` | **Classes :** 2 niveaux (0 = Faible, 1 = Élevé)
 
-#### 📌 Features utilisées par le modèle (dans l'ordre exact) :
+#### 📌 Features utilisées par le modèle (dans l'ordre exact)
 
 | # | Feature (`clé`) | Unité | Description |
 | :--- | :--- | :--- | :--- |
@@ -171,7 +171,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 | 6 | `bmi` | kg/m² | Indice de Masse Corporelle (IMC) |
 | 7 | `autonomie` | % | Score d'autonomie fonctionnelle |
 
-#### 📊 Seuils Physiologiques et Impacts Analysés par l'IA :
+#### 📊 Seuils Physiologiques et Impacts Analysés par l'IA
 
 | Variable (`feature`) | Valeur / Seuil Détecté | Impact Identifié | Explication clinique |
 | :--- | :--- | :--- | :--- |
@@ -180,7 +180,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 | `comorbiditesCount` | `>= 3` | `HIGH` | Polypathologie complexe |
 | `autonomie` | `< 60 %` | `MODERATE` | Perte d'autonomie fonctionnelle |
 
-#### 🔴 Logique de Niveaux de Risque Final :
+#### 🔴 Logique de Niveaux de Risque Final
 
 | Condition | `niveauRisque` | `intituleDiagnostic` |
 | :--- | :--- | :--- |
@@ -193,7 +193,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 
 **Version :** `1.1.0` | **Classes :** 2 niveaux (0 = Faible/Modéré, 1 = Élevé)
 
-#### 📌 Features utilisées par le modèle (dans l'ordre exact) :
+#### 📌 Features utilisées par le modèle (dans l'ordre exact)
 
 | # | Feature (`clé`) | Unité | Description |
 | :--- | :--- | :--- | :--- |
@@ -206,7 +206,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 | 7 | `tabagisme` | 0/1 | Tabagisme actif (0 = Non, 1 = Oui) |
 | 8 | `cholesterol` | mmol/L | Cholestérolémie totale |
 
-#### 📊 Seuils Physiologiques et Impacts Analysés par l'IA :
+#### 📊 Seuils Physiologiques et Impacts Analysés par l'IA
 
 | Variable (`feature`) | Valeur / Seuil Détecté | Impact Identifié | Explication clinique |
 | :--- | :--- | :--- | :--- |
@@ -216,7 +216,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 | `pressionDiastolique` | `>= 90 mmHg` | `HIGH` | Hypertension diastolique modérée |
 | `bmi` | `>= 30 kg/m²` | `MODERATE` | Obésité (Facteur de risque cardiovasculaire) |
 
-#### 🔴 Logique de Niveaux de Risque Final :
+#### 🔴 Logique de Niveaux de Risque Final
 
 | Condition | `niveauRisque` | `intituleDiagnostic` |
 | :--- | :--- | :--- |
@@ -229,7 +229,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 
 **Version :** `1.0.0` | **Classes :** 2 niveaux (0 = Normal, 1 = Anomalie Détectée)
 
-#### 📌 Features utilisées par le modèle (dans l'ordre exact) :
+#### 📌 Features utilisées par le modèle (dans l'ordre exact)
 
 | # | Feature (`clé`) | Unité | Description |
 | :--- | :--- | :--- | :--- |
@@ -242,7 +242,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 | 7 | `potassium` | mmol/L | Kaliémie (Ionogramme) |
 | 8 | `natremie` | mmol/L | Natrémie / Sodium (Ionogramme) |
 
-#### 📊 Seuils Physiologiques et Impacts Analysés par l'IA :
+#### 📊 Seuils Physiologiques et Impacts Analysés par l'IA
 
 | Variable (`feature`) | Valeur / Seuil Détecté | Impact Identifié | Explication clinique |
 | :--- | :--- | :--- | :--- |
@@ -251,7 +251,7 @@ Pour chaque modèle, l'IA analyse un ensemble spécifique de **constantes vitale
 | `crp` | `> 50 mg/L` | `HIGH` | Syndrome inflammatoire majeur |
 | `plaquettes` | `< 100 000 /mm³` | `HIGH` | Thrombopénie sévère |
 
-#### 🔴 Logique de Niveaux de Risque Final :
+#### 🔴 Logique de Niveaux de Risque Final
 
 | Condition | `niveauRisque` | `intituleDiagnostic` |
 | :--- | :--- | :--- |
@@ -330,6 +330,7 @@ Le service autorise **deux modes d'entrée des données** :
 - **Route via Nginx Gateway** : `POST http://localhost:5030/api/diagnosis/predict`
 - **Route Directe Service** : `POST http://localhost:3007/predict`
 - **En-têtes (Headers)** :
+
   ```http
   Content-Type: application/json
   Authorization: Bearer <accessToken>
@@ -354,7 +355,7 @@ Le service autorise **deux modes d'entrée des données** :
 }
 ```
 
-#### Description des Champs de la Requête :
+#### Description des Champs de la Requête
 
 | Champ | Type | Obligatoire | Description |
 | :--- | :--- | :--- | :--- |
@@ -362,7 +363,7 @@ Le service autorise **deux modes d'entrée des données** :
 | `patientId` | `string` | **Oui** | UUID unique ou identifiant FHIR du patient. |
 | `encounterId` | `string` | Non | UUID de la consultation / hospitalisation en cours (`Encounter`). |
 | `features` | `object` | Optionnel* | Dictionnaire clé-valeur contenant les constantes et mesures. Les features manquantes sont remplacées par les valeurs par défaut (section 4). |
-| `observationIds` | `array[str]`| Optionnel* | Liste des identifiants des ressources `Observation` enregistrées dans FHIR. |
+| `observationIds` | `array[str]` | Optionnel* | Liste des identifiants des ressources `Observation` enregistrées dans FHIR. |
 
 *\* Note : Il est recommandé de fournir au moins `features` ou `observationIds`.*
 
@@ -448,8 +449,8 @@ L'API répond avec une structure JSON standardisée contenant le résultat expli
 | `prediction.scoreProbabilite` | `float` | Score de probabilité calculé par le modèle (0.00 à 1.00). |
 | `prediction.niveauRisque` | `string` | Niveau de risque qualitatif (`LOW`, `MODERATE`, `HIGH`, `CRITICAL`). |
 | `prediction.intituleDiagnostic` | `string` | Titre/Diagnostic généré par l'IA. |
-| `prediction.facteursContributifs`| `array[object]`| Liste détaillée des facteurs ayant influencé la décision avec leur impact. |
-| `prediction.recommandations` | `array[string]`| Actions cliniques recommandées au praticien. |
+| `prediction.facteursContributifs` | `array[object]` | Liste détaillée des facteurs ayant influencé la décision avec leur impact. |
+| `prediction.recommandations` | `array[string]` | Actions cliniques recommandées au praticien. |
 | `fhirResource` | `object` | Ressource HL7/FHIR `RiskAssessment` prête à l'archivage. |
 
 ---
@@ -659,3 +660,5 @@ curl -X POST http://localhost:5030/api/diagnosis/predict \
     }
   }'
 ```
+
+check 2
