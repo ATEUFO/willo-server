@@ -660,5 +660,3 @@ curl -X POST http://localhost:5030/api/diagnosis/predict \
     }
   }'
 ```
-
-check 2
